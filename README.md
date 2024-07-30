@@ -22,7 +22,7 @@ This repository contains a Todo application built with Vue 3, TypeScript, Vite, 
    npm install
    node src/index.js
 
-   This project is licensed under the MIT License.
+3.This project is licensed under the MIT License.
 
 
 
