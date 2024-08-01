@@ -17,6 +17,11 @@ const resolvers = {
       await todo.save();
       return todo;
     },
+    removeTodo: async (_, { id }) => {
+      const todo = await Todo.findByIdAndDelete(id)
+      if (!todo) throw new Error('Todo not found');
+      return todo;
+    },
   },
 };
 

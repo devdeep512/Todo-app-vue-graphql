@@ -28,6 +28,9 @@
             class="mr-2"
           />
           <span :class="{ 'line-through text-gray-500': todo.completed }">{{ todo.text }}</span>
+          <button @click="removeTodo(todo.id)" class="ml-auto bg-red-500 text-white rounded px-2 py-1">
+            Remove
+          </button>
         </li>
       </ul>
     </div>
@@ -65,6 +68,14 @@ const TOGGLE_TODO = gql`
     toggleTodo(id: $id) {
       id
       completed
+    }
+  }
+`;
+
+const REMOVE_TODO = gql`
+  mutation RemoveTodo($id: ID!) {
+    removeTodo(id: $id) {
+      id
     }
   }
 `;
@@ -127,11 +138,33 @@ export default defineComponent({
       }
     };
 
+    // Remove todo mutation
+    const { mutate: removeTodoMutation } = useMutation(REMOVE_TODO, {
+      update(cache, { data: { removeTodo } }) {
+        const data = cache.readQuery<{ todos: any[] }>({ query: GET_TODOS });
+        const updatedTodos = data?.todos.filter(todo => todo.id !== removeTodo.id);
+        cache.writeQuery({
+          query: GET_TODOS,
+          data: { todos: updatedTodos },
+        });
+      },
+    });
+
+    // Handle remove todo
+    const removeTodo = async (id: string) => {
+      try {
+        await removeTodoMutation({ id });
+      } catch (err) {
+        console.error('Error removing todo:', err);
+      }
+    };
+
     return {
       todos,
       newTodo,
       addTodo,
       toggleTodo,
+      removeTodo,
       loading,
       error,
     };
